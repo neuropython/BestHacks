@@ -3,6 +3,22 @@ from typing import List
 from models.user_model import Tags
 from enum import Enum
 import secrets
+import datetime
+import os
+from dotenv import load_dotenv
+from pymongo import MongoClient
+
+
+load_dotenv()
+
+PASSWORD = os.getenv("password")
+USERNAME = os.getenv("user") 
+
+MONGO_URI = f"mongodb+srv://{USERNAME}:{PASSWORD}@hackyeahbackend.ai51i.mongodb.net/?retryWrites=true&w=majority&appName=HackYeahBackend"
+
+
+db = MongoClient(MONGO_URI)
+db = db['BestHacks']
 
 class WorkingType(str, Enum):
     FullTime = "FullTime"
@@ -25,7 +41,7 @@ class Level_of_experience(str, Enum):
     Other = "Other"
 
 class Annoucement(BaseModel):
-    id : str = secrets.token_hex(nbytes=16) 
+    id : str
     title: str
     abstract: str
     full_text: str
@@ -34,12 +50,31 @@ class Annoucement(BaseModel):
     owner_id: str
     owner_picture: str
     owner_type: str
-    views: int
     when_added: str
     location : str
-    is_active: bool
     working_type: WorkingType
     level_of_experience: str
     requirements: List[str]
+
+class AnnoucementInDb(Annoucement):
+    id : str = secrets.token_hex(nbytes=16) 
+    views: int = 0
+    is_active: bool = True
+    when_added: str = datetime.datetime.now().strftime("%d/%m/%Y")
+    owner_picture: str = None
+    owner_type: str = None
+    owner: str = None
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        user = db['Users'].find_one({"id": self.owner_id})
+        self.owner = user['username']
+        self.owner_picture = user['profile_picture']
+        self.owner_type = user['user_type']
+        
+        
+
+
+
     
 
