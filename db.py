@@ -3,11 +3,11 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from models.user_model import User, UserInDB
+from models.user_model import User, UserInDB, Tags
 from models.annoucement_model import Annoucement
+from models.note_model import Note
 import bcrypt
 from http import HTTPStatus
-
 
 # Load environment variables
 load_dotenv()
@@ -17,8 +17,6 @@ USERNAME = os.getenv("user")
 
 MONGO_URI = f"mongodb+srv://{USERNAME}:{PASSWORD}@hackyeahbackend.ai51i.mongodb.net/?retryWrites=true&w=majority&appName=HackYeahBackend"
 
-# FastAPI app instance
-app = FastAPI()
 
 class DB:
     _instance = None
@@ -100,8 +98,35 @@ class DB:
 
     def get_annoucement_owner(self, owner: str):
         annoucements = self.db['Annoucements'].find({"owner": owner})
-        return [Annoucement(**annoucement) for annoucement in annoucements]    
+        return [Annoucement(**annoucement) for annoucement in annoucements]  
+
+    def get_all_tags(self):
+        return [tag.value for tag in Tags]
     
+    def send_note(self, note: Note):
+        if note.owner_id:
+            user = self.db['Users'].find_one({"id": note.owner_id})
+            if not user:
+                raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
+        if note.send_to_id:
+            user = self.db['Users'].find_one({"id": note.send_to_id})
+            if not user:
+                raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
+        result = self.db['Notes'].insert_one(note.dict())
+        if result.inserted_id:
+            return {"message": "Note sent successfully", "status_code": HTTPStatus.CREATED}
+        else:
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Error sending note")
+    
+    def get_all_my_notes(self, owner_id: str):
+        notes = self.db['Notes'].find({"owner_id": owner_id})
+        return [Note(**note) for note in notes]
+    
+    def get_all_notes_for_me(self, send_to: str):
+        notes = self.db['Notes'].find({"send_to_id": send_to})
+        return [Note(**note) for note in notes]
+    
+
 
 
 if __name__ == "__main__":
@@ -147,12 +172,36 @@ if __name__ == "__main__":
         level_of_experience="Entry",
         requirements=["Python", "Java"]
     )
-    msg = db_instance.add_annoucement(annoucement)
-    print(msg)
+    # msg = db_instance.add_annoucement(annoucement)
+    # print(msg)
     annoucements = db_instance.get_all_annoucements()
     for annoucement in annoucements:
-        print(annoucement.title)
+        # print(annoucement.title)
         annoucement_id = annoucement.id
 
     annoucement = db_instance.get_annoucement(annoucement_id)
-    print(annoucement.dict())
+    # print(annoucement.dict())
+
+    tags = db_instance.get_all_tags()
+    # print(tags)
+
+    note = Note(
+        title="Title",
+        content="Content",
+        owner="John Doe",
+        owner_id=user.id,
+        owner_picture="profile.jpg",
+        send_to="Jane Doe",
+        send_to_id=user.id,
+        accepted=False
+    )
+    msg = db_instance.send_note(note)
+    print(msg)
+    notes = db_instance.get_all_my_notes(user.id)
+    for note in notes:
+        print(note.title)
+    
+    notes = db_instance.get_all_notes_for_me(user.id)
+    for note in notes:
+        print(note.title)
+    
