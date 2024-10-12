@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from models.user_model import User, UserInDB, Tags
-from models.annoucement_model import Annoucement
+from models.annoucement_model import Annoucement, AnnoucementInDb
 from models.note_model import Note
 import bcrypt
 from http import HTTPStatus
@@ -44,7 +44,7 @@ class DB:
     def get_user(self, username: str):
         user = self.db['Users'].find_one({"username": username})
         if user:
-            return User(**user)
+            return user.get("id")
         else:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
     
@@ -72,7 +72,7 @@ class DB:
         else:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid password")
         
-    def add_annoucement(self, annoucement: Annoucement):
+    def add_annoucement(self, annoucement: AnnoucementInDb):
         if annoucement.owner_id:
             user = self.db['Users'].find_one({"id": annoucement.owner_id})
             if not user:
@@ -80,7 +80,7 @@ class DB:
         result = self.db['Annoucements'].insert_one(annoucement.dict())
         if result.inserted_id:
             self.db['Users'].update_one({"id": annoucement.owner_id}, {"$inc": {"how_many_requests": 1}})
-            return {"message": "Annoucement added successfully", "status_code": HTTPStatus.CREATED}
+            return Annoucement(**annoucement.dict())
         else:
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Error adding annoucement")
     
