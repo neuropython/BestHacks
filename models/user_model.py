@@ -6,10 +6,6 @@ import secrets
 import os 
 import dotenv
 
-dotenv.load_dotenv()
-
-SALT = os.getenv("SALT")
-
 
 class Tags(str, Enum):
     Infromatics = "Informatics"
