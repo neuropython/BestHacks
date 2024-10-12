@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from models.user_model import User, UserInDB
+from models.annoucement_model import Annoucement
 import bcrypt
 from http import HTTPStatus
 
@@ -71,3 +72,81 @@ class DB:
             return {"message": "User validated successfully"}
         else:
             raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Invalid password")
+        
+    def add_annoucement(self, annoucement: Annoucement):
+        if annoucement.owner_id:
+            user = self.db['Users'].find_one({"id": annoucement.owner_id})
+            if not user:
+                raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="User not found")
+        result = self.db['Annoucements'].insert_one(annoucement.dict())
+        if result.inserted_id:
+            self.db['Users'].update_one({"id": annoucement.owner_id}, {"$inc": {"how_many_requests": 1}})
+            return {"message": "Annoucement added successfully", "status_code": HTTPStatus.CREATED}
+        else:
+            raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Error adding annoucement")
+    
+    def get_all_annoucements(self):
+        annoucements = self.db['Annoucements'].find()
+        return [Annoucement(**annoucement) for annoucement in annoucements]
+
+    def get_annoucement(self, annoucement_id: str):
+        annoucement = self.db['Annoucements'].find_one({"id": annoucement_id})
+        if annoucement:
+            self.db['Annoucements'].update_one({"id": annoucement_id}, {"$inc": {"views": 1}})
+            return Annoucement(**annoucement)
+        else:
+            raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Annoucement not found")
+        
+                
+if __name__ == "__main__":
+    db = DB()
+    new_user = UserInDB(
+        name="John",
+        second_name="Doe",
+        bio="This is a bio",
+        email="user@example.com",
+        username="user1",
+        password="password123",
+        profile_picture="profile.jpg",
+        how_many_requests=0,
+        user_type='Student',
+        tags=['Languages'],
+        academical_index="A"
+    )
+    db_instance = DB()
+    # msg = db_instance.create_new_user(new_user)
+    # print(msg)
+    user = db_instance.get_user("user1")
+    # print(user.id)
+    user = db_instance.get_user_id(user.id)
+    # print(user.username)
+    # msg = db_instance.change_profile_picture(user.id, "new_profile2.jpg")
+    # print(msg)
+    msg = db_instance.validate_user("user1", "password123")
+    # print(msg)
+    annoucement = Annoucement(
+        title="Title",
+        abstract="Abstract",
+        full_text="Full text",
+        tags=["Languages"],
+        owner="John Doe",
+        owner_id=user.id,
+        owner_picture="profile.jpg",
+        owner_type="Student",
+        views=0,
+        when_added="10/11/2021",
+        location="Warsaw",
+        is_active=True,
+        working_type="FullTime",
+        level_of_experience="Entry",
+        requirements=["Python", "Java"]
+    )
+    msg = db_instance.add_annoucement(annoucement)
+    print(msg)
+    annoucements = db_instance.get_all_annoucements()
+    for annoucement in annoucements:
+        print(annoucement.title)
+        annoucement_id = annoucement.id
+
+    annoucement = db_instance.get_annoucement(annoucement_id)
+    print(annoucement.dict())
