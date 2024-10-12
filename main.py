@@ -52,8 +52,21 @@ async def get_all_annoucements():
 async def get_annoucement_id(annoucement_id: str):
     return db.get_annoucement_id(annoucement_id)
 
+@app.get('/get_all_tags')
+async def get_all_tags():
+    return db.get_all_tags()
 
+@app.post('/send_note/{send_from_id}/{send_to_id}')
+async def send_note(send_from_id: str, send_to_id: str):
+    return db.send_note(send_from_id, send_to_id)
 
+@app.get('/get_all_my_notes/{owner_id}')
+async def get_all_my_notes(owner_id: str):
+    return db.get_all_my_notes(owner_id)
+
+@app.get('/get_all_notes_for_me/{send_to_id}')
+async def get_all_notes_for_me(send_to_id: str):
+    return db.get_all_notes_for_me(send_to_id)
 
 @app.get('/kleksik')
 async def kleksik():
