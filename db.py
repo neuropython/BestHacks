@@ -8,6 +8,7 @@ from models.annoucement_model import Annoucement
 import bcrypt
 from http import HTTPStatus
 
+
 # Load environment variables
 load_dotenv()
 
@@ -96,8 +97,13 @@ class DB:
             return Annoucement(**annoucement)
         else:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Annoucement not found")
-        
-                
+
+    def get_annoucement_owner(self, owner: str):
+        annoucements = self.db['Annoucements'].find({"owner": owner})
+        return [Annoucement(**annoucement) for annoucement in annoucements]    
+    
+
+
 if __name__ == "__main__":
     db = DB()
     new_user = UserInDB(
