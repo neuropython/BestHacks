@@ -53,8 +53,10 @@ if __name__ == "__main__":
         academical_index="A"
     )
     db_instance = DB()
-    msg = db_instance.create_new_user(new_user)
-    print(msg)
+    # msg = db_instance.create_new_user(new_user)
+    # print(msg)
+    user = db_instance.get_user("user1")
+    print(user)
 
 
         
