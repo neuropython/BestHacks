@@ -1,7 +1,14 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 import bcrypt
+import secrets
+import os 
+import dotenv
+
+dotenv.load_dotenv()
+
+SALT = os.getenv("SALT")
 
 
 class Tags(str, Enum):
@@ -62,7 +69,7 @@ class UserType(str, Enum):
     Professional = "Professional"
 
 class User(BaseModel):
-    object_id: str  
+    id : str = secrets.token_hex(nbytes=16)
     name: str
     second_name: str
     bio: str
