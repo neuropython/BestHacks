@@ -4,21 +4,9 @@ from models.user_model import Tags
 from enum import Enum
 import secrets
 import datetime
-import os
-from dotenv import load_dotenv
-from pymongo import MongoClient
+from config import ConnecttoDB
 
-
-load_dotenv()
-
-PASSWORD = os.getenv("password")
-USERNAME = os.getenv("user") 
-
-MONGO_URI = f"mongodb+srv://{USERNAME}:{PASSWORD}@hackyeahbackend.ai51i.mongodb.net/?retryWrites=true&w=majority&appName=HackYeahBackend"
-
-
-db = MongoClient(MONGO_URI)
-db = db['BestHacks']
+db = ConnecttoDB().connect()
 
 class WorkingType(str, Enum):
     FullTime = "FullTime"
