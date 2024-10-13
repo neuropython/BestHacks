@@ -8,6 +8,8 @@ from models.annoucement_model import Annoucement, AnnoucementInDb
 from models.note_model import Note, NoteInDB
 import bcrypt
 from http import HTTPStatus
+import threading
+import csv
 
 # Load environment variables
 load_dotenv()
@@ -29,6 +31,7 @@ class DB:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client['BestHacks']
+        self.start_change_stream_listener()
 
     def create_new_user(self, user: UserInDB):
         if self.db['Users'].find_one({"username": user.username}):
@@ -119,15 +122,34 @@ class DB:
             raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Error sending note")
     
     def get_all_my_notes(self, owner_id: str):
+        if owner_id[0] == '"':
+            owner_id = owner_id[1:-1]
         notes = self.db['Notes'].find({"owner_id": owner_id})
         return [Note(**note) for note in notes]
     
     def get_all_notes_for_me(self, send_to: str):
+        if send_to[0] == '"':
+            send_to = send_to[1:-1]
         notes = self.db['Notes'].find({"send_to_id": send_to})
         return [Note(**note) for note in notes]
     
+    def start_change_stream_listener(self):
+        def listen_to_changes():
+            with self.db['Annoucements'].watch() as stream:
+                for change in stream:
+                    self.handle_change(change)
 
+        thread = threading.Thread(target=listen_to_changes)
+        thread.daemon = True
+        thread.start()
 
+    def handle_change(self, change):
+        title = change['fullDocument']["title"]
+        abstract = change['fullDocument']["abstract"]
+        
+        with open('annoucement_data.txt', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([title, abstract])
 
 if __name__ == "__main__":
     db = DB()
