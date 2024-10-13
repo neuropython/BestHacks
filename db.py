@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from models.user_model import User, UserInDB, Tags
 from models.annoucement_model import Annoucement, AnnoucementInDb
-from models.note_model import Note
+from models.note_model import Note, NoteInDB
 import bcrypt
 from http import HTTPStatus
 
@@ -103,7 +103,7 @@ class DB:
     def get_all_tags(self):
         return [tag.value for tag in Tags]
     
-    def send_note(self, note: Note):
+    def send_note(self, note: NoteInDB):
         if note.owner_id:
             user = self.db['Users'].find_one({"id": note.owner_id})
             if not user:
@@ -147,27 +147,21 @@ if __name__ == "__main__":
     db_instance = DB()
     # msg = db_instance.create_new_user(new_user)
     # print(msg)
-    user = db_instance.get_user("user1")
+    id = db_instance.get_user("user1")
     # print(user.id)
-    user = db_instance.get_user_id(user.id)
+    user = db_instance.get_user_id(id)
     # print(user.username)
     # msg = db_instance.change_profile_picture(user.id, "new_profile2.jpg")
     # print(msg)
     msg = db_instance.validate_user("user1", "password123")
     # print(msg)
-    annoucement = Annoucement(
+    annoucement = AnnoucementInDb(
         title="Title",
         abstract="Abstract",
         full_text="Full text",
         tags=["Languages"],
-        owner="John Doe",
-        owner_id=user.id,
-        owner_picture="profile.jpg",
-        owner_type="Student",
-        views=0,
-        when_added="10/11/2021",
+        owner_id=id,
         location="Warsaw",
-        is_active=True,
         working_type="FullTime",
         level_of_experience="Entry",
         requirements=["Python", "Java"]
@@ -185,18 +179,15 @@ if __name__ == "__main__":
     tags = db_instance.get_all_tags()
     # print(tags)
 
-    note = Note(
+    note = NoteInDB(
         title="Title",
         content="Content",
-        owner="John Doe",
-        owner_id=user.id,
-        owner_picture="profile.jpg",
-        send_to="Jane Doe",
-        send_to_id=user.id,
+        owner_id=id,
+        send_to_id=id,
         accepted=False
     )
-    msg = db_instance.send_note(note)
-    print(msg)
+    # msg = db_instance.send_note(note)
+    # print(msg)
     notes = db_instance.get_all_my_notes(user.id)
     for note in notes:
         print(note.title)
