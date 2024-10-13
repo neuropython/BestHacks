@@ -1,7 +1,8 @@
 from db import DB
 from fastapi import FastAPI
 from models.user_model import User, UserInDB
-from models.annoucement_model import Annoucement
+from models.note_model import Note, NoteInDB
+from models.annoucement_model import Annoucement, AnnoucementInDb
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -37,7 +38,7 @@ async def validate_user(username: str, password: str):
     return db.validate_user(username, password)
 
 @app.post("/add_annoucement")
-async def add_annoucement(annoucement: Annoucement):
+async def add_annoucement(annoucement: AnnoucementInDb):
     return db.add_annoucement(annoucement)
 
 @app.get('/get_annoucement_owner/{owner}')
@@ -48,17 +49,17 @@ async def get_annoucement_owner(owner: str):
 async def get_all_annoucements():
     return db.get_all_annoucements()
 
-@app.get('/get_annoucement_id/{annoucement_id}')
-async def get_annoucement_id(annoucement_id: str):
-    return db.get_annoucement_id(annoucement_id)
+@app.get('/get_annoucement/{annoucement_id}')
+async def get_annoucement(annoucement_id: str):
+    return db.get_annoucement(annoucement_id)
 
 @app.get('/get_all_tags')
 async def get_all_tags():
     return db.get_all_tags()
 
-@app.post('/send_note/{send_from_id}/{send_to_id}')
-async def send_note(send_from_id: str, send_to_id: str):
-    return db.send_note(send_from_id, send_to_id)
+@app.post('/send_note')
+async def send_note(note:NoteInDB): 
+    return db.send_note(note)
 
 @app.get('/get_all_my_notes/{owner_id}')
 async def get_all_my_notes(owner_id: str):
@@ -68,6 +69,6 @@ async def get_all_my_notes(owner_id: str):
 async def get_all_notes_for_me(send_to_id: str):
     return db.get_all_notes_for_me(send_to_id)
 
-@app.get('/kleksik')
+@app.get('/nigalink/georgedroid/{george}/fenta/{fenta}')
 async def kleksik():
     return {"message": "kleksik"}
