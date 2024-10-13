@@ -5,10 +5,16 @@ from models.note_model import Note, NoteInDB
 from models.annoucement_model import Annoucement, AnnoucementInDb
 from fastapi.middleware.cors import CORSMiddleware
 from search_eninges import SearchEngines, SearchEnginesEnum
- 
+import ollama 
+from fastapi.responses import StreamingResponse
+
+
+
 app = FastAPI()
 db = DB()
 filters = SearchEngines()
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -75,6 +81,33 @@ async def search(search_type:SearchEnginesEnum, search_query: str):
     return filters.search(search_type,search_query)
 
 
-@app.get('/nigalink/georgedroid/{george}/fenta/{fenta}')
-async def kleksik():
-    return {"message": "kleksik"}
+@app.get('/ask_ai/{question}')
+async def ask_ai(question: str):
+    # Read the data from the file containing project titles
+    with open(r'C:\Users\Damian\Documents\BestHacks\annoucement_data.txt', 'r') as file:
+        data = file.read()
+
+    # Set up the LLaMA prompt with the project data and the user question
+    stream = ollama.chat(
+        model='llama3.2',
+        messages=[{
+            'role': 'assistant',
+            'content': (
+                f"Here are some project titles:\n{data}\n\n"
+                f"Based on the question: '{question}', "
+                "please select one project title that fits best. "
+                "Respond in one line (10 words or fewer) for a non-technical person."
+            )
+        }],
+        stream=True
+    )
+
+    # Generator for streaming tokens
+    def token_generator():
+        for chunk in stream:
+            token = chunk['message']['content']
+            yield token
+            print(token, end='', flush=True)
+
+    # Return the streamed response
+    return StreamingResponse(token_generator(), media_type='text/plain')
