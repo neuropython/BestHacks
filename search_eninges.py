@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import datetime
 from fastapi import HTTPException
 from enum import Enum
+from models.annoucement_model import Annoucement
+
 
 load_dotenv()
 PASSWORD = os.getenv("password")
@@ -41,56 +43,57 @@ class SearchEngines:
     def search_by_title(self, title: str):
         annoucements = self.db['Annoucements'].find({"title": {"$regex": title, "$options": "i"}})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             raise HTTPException(status_code=404, detail="Annoucement not found")
     
     def search_by_owner(self, owner: str):
         annoucements = self.db['Annoucements'].find({"owner": {"$regex": owner, "$options": "i"}})
+        print(annoucements)
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             raise HTTPException(status_code=404, detail="Annoucement not found")
     
     def search_by_tags(self, tags: List[str]):
         annoucements = self.db['Annoucements'].find({"tags": {"$in": tags}})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             raise HTTPException(status_code=404, detail="Annoucement not found")
         
     def search_by_location(self, location: str):
         annoucements = self.db['Annoucements'].find({"location": {"$regex": location, "$options": "i"}})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
     
     def search_by_working_type(self, working_type: str):
         annoucements = self.db['Annoucements'].find({"working_type": working_type})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
     
     def search_by_level_of_experience(self, level_of_experience: str):
         annoucements = self.db['Annoucements'].find({"level_of_experience": level_of_experience})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
         
     def search_by_requirements(self, requirements: List[str]):
         annoucements = self.db['Annoucements'].find({"requirements": {"$all": requirements}})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
     
     def search_by_owner_type(self, owner_type: str):
         annoucements = self.db['Annoucements'].find({"owner_type": owner_type})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
     
@@ -98,16 +101,17 @@ class SearchEngines:
         date = datetime.datetime.strptime(when_added, "%d/%m/%Y")
         annoucements = self.db['Annoucements'].find({"when_added": {"$gte": date}})
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
         
     def search_by_popularity(self):
         annoucements = self.db['Annoucements'].find().sort("views", -1)
         if annoucements:
-            return [annoucement for annoucement in annoucements]
+            return [Annoucement(**annoucement) for annoucement in annoucements]  
         else:
             return HTTPException(status_code=404, detail="Annoucement not found")
+    
     
     def search(self, search_engine: SearchEnginesEnum, search_value):
         if search_engine == SearchEnginesEnum.title:
@@ -136,7 +140,7 @@ class SearchEngines:
 
 if __name__ == "__main__":
     search = SearchEngines()
-    results = search.search(SearchEnginesEnum.title, "Title")
+    results = search.search("title", "python")
     print(results)
     # results = search.search(SearchEnginesEnum.owner, "user1")
     # for result in results:
