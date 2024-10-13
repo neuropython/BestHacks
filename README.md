@@ -37,3 +37,10 @@ pip install fastapi uvicorn pydantic
 
 ```bash
 uvicorn main:app --reload
+```
+
+Open app via localhost 
+---
+## Documentation 
+
+- Documentation would be shown at  **`/docs`**
