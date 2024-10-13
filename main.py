@@ -4,10 +4,11 @@ from models.user_model import User, UserInDB
 from models.note_model import Note, NoteInDB
 from models.annoucement_model import Annoucement, AnnoucementInDb
 from fastapi.middleware.cors import CORSMiddleware
-
-
+from search_eninges import SearchEngines
+ 
 app = FastAPI()
 db = DB()
+SearchEngines = SearchEngines()
 
 app.add_middleware(
     CORSMiddleware,
@@ -68,6 +69,11 @@ async def get_all_my_notes(owner_id: str):
 @app.get('/get_all_notes_for_me/{send_to_id}')
 async def get_all_notes_for_me(send_to_id: str):
     return db.get_all_notes_for_me(send_to_id)
+
+@app.get('/search/{search_type}/{search_query}')
+async def search(search_type:str, search_query: str):
+    return SearchEngines.search(search_type,search_query)
+
 
 @app.get('/nigalink/georgedroid/{george}/fenta/{fenta}')
 async def kleksik():
