@@ -22,6 +22,8 @@ class NoteInDB(Note):
         super().__init__(**data)
         if self.owner_id[0] == '"':
             self.owner_id = self.owner_id[1:-1]
+        if self.send_to_id[0] == '"':
+            self.send_to_id = self.send_to_id[1:-1]    
         user = db['Users'].find_one({"id": str(self.owner_id)})
         self.owner = user['username']
         self.owner_picture = user['profile_picture']
