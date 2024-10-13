@@ -3,8 +3,6 @@ from pydantic import BaseModel, Field
 from typing import List
 import bcrypt
 import secrets
-import os 
-import dotenv
 
 
 class Tags(str, Enum):

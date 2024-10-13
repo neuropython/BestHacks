@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from typing import Optional
-import datetime
 from config import ConnecttoDB
 
 db = ConnecttoDB().connect()
