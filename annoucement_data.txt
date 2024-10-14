@@ -1,0 +1,17 @@
+Health Monitoring Device,This project develops a wearable device for continuous health monitoring using biosensors.
+Autonomous Delivery Drone,This thesis focuses on the development of an autonomous drone for efficient package delivery in urban environments.
+Hydraulic System Optimization,This thesis aims to optimize hydraulic systems used in construction machinery to improve efficiency and reduce fuel consumption.
+Predictive Manufacturing,Developing an AI system to predict equipment failures in manufacturing settings to reduce downtime.
+Energy-Efficient Building Design,This thesis explores architectural designs that maximize energy efficiency in residential buildings.
+Development of a Smart Grid System,This project aims to design a smart grid that integrates renewable energy sources with the existing power infrastructure.
+Simulation of Fluid Flow in Pipelines,This thesis focuses on simulating fluid dynamics in various pipeline configurations to optimize flow rates.
+Smart Waste Management System,Developing a smart system to optimize waste collection routes and reduce operational costs.
+Smart Home Automation System,Creating a comprehensive home automation system to enhance convenience and energy efficiency.
+Construction of a Sustainable Urban Farm,This project aims to design a vertical urban farm utilizing hydroponics and renewable energy sources.
+Design of a Low-Cost Seismic Sensor Network,Developing an affordable seismic sensor network for real-time earthquake monitoring.
+Optimization of Water Distribution Systems,This thesis focuses on enhancing the efficiency of water distribution networks in urban settings.
+Development of a Smart Building Management System,Creating a comprehensive system to manage energy consumption and indoor climate in commercial buildings.
+Implementation of a 3D Printing System for Construction,This project explores the use of 3D printing technologies in building construction to reduce costs and waste.
+Creating an Augmented Reality Application for Engineering Education,Developing an AR application to enhance the learning experience for engineering students.
+Evaluation of Sustainable Transportation Solutions,This thesis investigates various sustainable transportation systems to reduce urban carbon footprints.
+Development of a Mobile App for Smart Agriculture,Creating a mobile application that assists farmers in managing their crops and resources effectively.
